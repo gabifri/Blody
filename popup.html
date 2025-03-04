@@ -8,12 +8,11 @@
       font-family: Arial, sans-serif;
       margin: 10px;
     }
-    .toggle-container {
-      display: flex;
-      align-items: center;
+    .toggle-container, .setting-container {
+      margin-bottom: 10px;
     }
-    .toggle-container label {
-      margin-left: 8px;
+    .setting-container label {
+      margin-right: 5px;
     }
   </style>
 </head>
@@ -22,7 +21,22 @@
     <input type="checkbox" id="toggleBlody" />
     <label for="toggleBlody">Activer Blody</label>
   </div>
-  <p>Version : 1.6</p>
+  <div class="setting-container">
+    <label for="boldCount">Nombre de lettres en gras (1-4) :</label>
+    <input type="number" id="boldCount" min="1" max="4" value="1">
+  </div>
+  <div class="setting-container">
+    <label for="colorOption">Couleur :</label>
+    <select id="colorOption">
+      <option value="auto">Auto</option>
+      <option value="custom">Custom</option>
+    </select>
+    <input type="color" id="customColor" value="#ff0000" style="display:none; margin-left:5px;">
+  </div>
+  <div class="setting-container">
+    <input type="checkbox" id="randomOption" />
+    <label for="randomOption">Nombre de lettres aléatoire</label>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
