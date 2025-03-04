@@ -1,4 +1,4 @@
-[Logo Large](https://github.com/user-attachments/assets/5ca144f6-f9bc-4121-a982-74c379da3a53)
+![Logo Large](https://github.com/user-attachments/assets/5ca144f6-f9bc-4121-a982-74c379da3a53)
 # Blody - Extension de Navigation pour Dyslexiques
 
 Blody est une extension de navigateur conçue pour aider les personnes dyslexiques à lire plus facilement et rapidement sur le web. Elle modifie dynamiquement l'affichage du texte en mettant en gras les premières lettres des mots tout en respectant la mise en page et la couleur d'origine.
