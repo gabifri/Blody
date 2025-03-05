@@ -4,30 +4,171 @@
   <meta charset="UTF-8">
   <title>Blody Extension</title>
   <style>
+    /* Dimensions globales un peu plus grandes (~10% plus large) */
     body {
-      font-family: Arial, sans-serif;
-      margin: 10px;
+      width: 330px; /* Largeur un peu plus grande que la popup standard (~300px) */
+      font-family: "inter", semi-bold;
+      margin: 15px;
+      background-color: #FEE5CB; /* fond légèrement pêche */
+      color: #8B5E34; /* texte brun */
     }
-    .toggle-container, .setting-container {
+    .header-logo {
+      display: block;
+      width: 80%;
       margin-bottom: 10px;
+      position: center;
+      margin: auto;
     }
+    .toggle-container,
+    .setting-container {
+      margin-bottom: 15px;
+    }
+    .toggle-container label,
     .setting-container label {
       margin-right: 5px;
+    }
+    /* Bouton de lecture audio (Play/Pause) */
+    .play-pause-btn {
+      background-color: #F8C999;
+      color: #8B5E34;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .play-pause-btn:hover {
+      background-color: #FCC9A0;
+    }
+    /* Slider de vitesse */
+    .speed-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .speed-container label {
+      min-width: 100px;
+    }
+    #speedSlider {
+      width: 100px;
+      margin-top: 5px;
+      accent-color: #F8C999; /* Couleur de la charte */
+    }
+    #speedText {
+      width: 35px;
+      text-align: center;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      background-color: #FEE5CB;
+      color: #8B5E34;
+    }
+    /* Blacklist */
+    #blacklistContainer {
+      display: none;
+      margin-top: 5px;
+    }
+    #blacklistList {
+      list-style: none;
+      padding: 0;
+    }
+    #blacklistList li {
+      margin: 2px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #blacklistList li button {
+      margin-left: 5px;
+    }
+    /* Boutons génériques */
+    button {
+      cursor: pointer;
+    }
+    #textZone {
+      text-align: center;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      background-color: #FEE5CB;
+      color: #8B5E34;
+    }
+    #blacklistInput {
+      text-align: center;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      background-color: #FEE5CB;
+      color: #8B5E34;
+    }
+    #boldCount {
+      width: 35px;
+      text-align: center;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      background-color: #FEE5CB;
+      color: #8B5E34;
+    }
+    #colorOption{
+      text-align: center;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      background-color: #FEE5CB;
+      color: #8B5E34;
+      position: relative;
+      z-index: 5;
+    }
+    #list{
+      position: absolute;
+      z-index: 10;
+    }
+    .btn {
+      background-color: #F8C999;
+      color: #8B5E34;
+      border: 1px solid #D9A676;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
   </style>
 </head>
 <body>
+  <!-- Logo Blody -->
+  <img src="Logo Large.png" alt="Blody" class="header-logo">
+
+  <!-- Activation Blody -->
   <div class="toggle-container">
     <input type="checkbox" id="toggleBlody" />
     <label for="toggleBlody">Activer Blody</label>
   </div>
+
+  <!-- Contrôles de lecture audio -->
   <div class="setting-container">
-    <label for="boldCount">Nombre de lettres en gras (1-4) :</label>
-    <input type="number" id="boldCount" min="1" max="4" value="1">
+    <button class="play-pause-btn" id="playPauseBtn">
+      <img id="playPauseIcon" src="play.png" alt="Play" style="height:20px;">
+      <span id="playPauseLabel">Play</span>
+    </button>
+  </div>
+  <div class="setting-container speed-container">
+    <label for="speedSlider">Vitesse :</label>
+    <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+    <input type="text" id="speedText" value="1.0">
+  </div>
+
+  <!-- Paramètres de mise en gras -->
+  <div class="setting-container">
+    <label for="boldCount">Lettres en gras (1-4) :</label>
+    <input type="number" id="boldCount" class="textZone" min="1" max="4" value="1">
   </div>
   <div class="setting-container">
     <label for="colorOption">Couleur :</label>
-    <select id="colorOption">
+    <select id="colorOption" class="list">
       <option value="auto">Auto</option>
       <option value="custom">Custom</option>
     </select>
@@ -37,6 +178,37 @@
     <input type="checkbox" id="randomOption" />
     <label for="randomOption">Nombre de lettres aléatoire</label>
   </div>
+
+  <!-- Blacklist -->
+  <div class="setting-container">
+    <label for="blacklistInput">Liste noire (domaines) :</label>
+    <input type="text" id="blacklistInput" placeholder="ex: konbini.com, google.com">
+    <button class="btn" id="addCurrentSite">Ajouter ce site</button>
+    <button class="btn" id="toggleBlacklistView">Afficher/Masquer</button>
+    <div id="blacklistContainer">
+      <h4>Sites blacklistés</h4>
+      <ul id="blacklistList"></ul>
+    </div>
+  </div>
+
+  <!-- Raccourci clavier -->
+  <div class="setting-container">
+    <label for="shortcutInput">Raccourci :</label>
+    <input type="text" id="shortcutInput" readonly placeholder="Alt+Shift+B">
+    <button id="recordShortcutBtn"
+      style="background-color:#F8C999; border:1px solid #D9A676; border-radius:4px; color:#8B5E34; padding:4px 10px;">
+      Changer
+    </button>
+  </div>
+
+  <!-- Bouton de réinitialisation -->
+  <div class="setting-container">
+    <button id="resetSettings"
+      style="background-color:#F8C999; border:1px solid #D9A676; border-radius:4px; color:#8B5E34; padding:6px 10px;">
+      Réinitialiser les réglages
+    </button>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
