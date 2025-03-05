@@ -1,9 +1,20 @@
 {
   "manifest_version": 3,
   "name": "Blody",
-  "version": "1.2.3",
-  "description": "Une extension pour aider les personnes dyslexiques en mettant en gras la première lettre de chaque mot.",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "version": "1.4.2",
+  "description": "Une extension pour aider les personnes dyslexiques en mettant en gras la première lettre (ou plus) de chaque mot.",
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "toggle-blody": {
+      "suggested_key": {
+        "default": "Alt+Shift+B"
+      },
+      "description": "Activer/Désactiver Blody"
+    }
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -18,5 +29,6 @@
       "js": ["content.js"],
       "run_at": "document_end"
     }
-  ]
+  ],
+  "optional_permissions": ["contextMenus"]
 }
