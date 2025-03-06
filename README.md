@@ -28,7 +28,7 @@ Blody est une extension de navigateur conçue pour aider les personnes dyslexiqu
 - Contrôle de la vitesse de lecture via un slider.
 
 ## 📥 Installation
-1. Télécharger le dossier (sourcecode.zip) de l'extension dans le realease (dernière version 1.4.2).
+1. Télécharger le dossier (sourcecode.zip) de l'extension dans le `[releases](https://github.com/gabifri/Blody/releases/tag/blody-V.1.4.2)` (dernière version 1.4.2).
 2. Aller dans `chrome://extensions/` (ou `edge://extensions/` pour Microsoft Edge).
 3. Activer le "Mode développeur".
 4. Cliquer sur "Charger un paquet non empaqueté" et sélectionner le dossier de l'extension.
