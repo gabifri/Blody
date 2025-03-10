@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const speedSlider = document.getElementById('speedSlider');
   const speedText = document.getElementById('speedText');
 
-  // Convertit la blacklist (chaîne) en tableau.
+  // Convertit la blacklist (chaîne) en tableau
   function parseBlacklist(str) {
     return str.split(',').map(s => s.trim()).filter(s => s);
   }
 
-  // Met à jour l'affichage de la blacklist.
+  // Met à jour l'affichage de la blacklist
   function updateBlacklistDisplay(blacklistStr) {
     const blacklist = parseBlacklist(blacklistStr);
     blacklistList.innerHTML = '';
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Enregistre et transmet les réglages aux onglets actifs.
+  // Enregistre et transmet les réglages aux onglets actifs
   function updateSettings() {
     const rate = parseFloat(speedSlider.value);
     const settings = {
