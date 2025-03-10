@@ -1,6 +1,7 @@
 (function() {
   console.debug("Blody extension : content script chargé.");
 
+  // Paramètres stockés
   let settings = {
     boldCount: 1,
     colorOption: "auto",
@@ -15,6 +16,7 @@
   let readingUtterance = null;
   let readingState = "stopped"; // "stopped", "playing", "paused"
 
+  // Applique le style en fonction des réglages
   function addBlodyStyle() {
     let style = document.getElementById('blody-style');
     if (style) style.remove();
@@ -30,6 +32,7 @@
     console.debug("Style Blody ajouté avec settings :", settings);
   }
 
+  // Vérifie si un nœud est déjà transformé
   function isInsideProcessed(node) {
     let current = node.parentNode;
     while (current) {
@@ -41,6 +44,7 @@
     return false;
   }
 
+  // Vérifie si un nœud se trouve dans un champ de saisie ou éditable
   function isInInputOrEditable(node) {
     if (!node.parentNode || !node.parentNode.tagName) return false;
     const tag = node.parentNode.tagName.toLowerCase();
@@ -49,6 +53,7 @@
     return false;
   }
 
+  // Transforme un nœud texte en mettant en gras les premières lettres
   function processTextNode(node) {
     if (node.parentNode && ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentNode.nodeName)) return;
     if (node.parentNode && ['TEXTAREA', 'INPUT', 'SELECT'].includes(node.parentNode.nodeName)) return;
@@ -61,6 +66,7 @@
     const container = document.createElement('span');
     container.setAttribute('data-blody-processed', 'true');
 
+    // Séparation par mots + espaces
     const parts = text.split(/(\s+)/);
     parts.forEach(part => {
       if (part && !/^\s+$/.test(part)) {
@@ -74,21 +80,25 @@
         }
         const boldText = part.substring(0, count);
         const restText = part.substring(count);
+
         const boldSpan = document.createElement('span');
         boldSpan.className = 'blody-bold';
         boldSpan.textContent = boldText;
         wordSpan.appendChild(boldSpan);
+
         if (restText) {
           wordSpan.appendChild(document.createTextNode(restText));
         }
         container.appendChild(wordSpan);
       } else {
+        // Espace ou mot vide
         container.appendChild(document.createTextNode(part));
       }
     });
     node.parentNode.replaceChild(container, node);
   }
 
+  // Exécute la callback lors d'un temps d'inactivité
   function idleCallback(callback) {
     if ('requestIdleCallback' in window) {
       requestIdleCallback(callback);
@@ -97,6 +107,7 @@
     }
   }
 
+  // Transforme par lots les nœuds texte
   function processTextNodesBatch(nodes, doneCallback) {
     let index = 0;
     function processBatch(deadline) {
@@ -113,6 +124,7 @@
     idleCallback(processBatch);
   }
 
+  // Parcourt et transforme les nœuds texte d'un élément racine
   function transformTextNodes(root) {
     const walker = document.createTreeWalker(
       root,
@@ -136,13 +148,13 @@
     processTextNodesBatch(textNodes);
   }
 
-  // Lecture audio : cherche <article> ou body
+  // Récupère le texte lisible : si <article> existe, sinon <body>
   function getReadableText() {
     const articleElement = document.querySelector("article");
     return articleElement ? articleElement.innerText : document.body.innerText;
   }
 
-  // Play/Pause/Resume
+  // Gère la lecture Play/Pause/Resume
   function toggleReadPlayPause(rate) {
     if (readingState === "stopped") {
       const text = getReadableText();
@@ -174,6 +186,7 @@
     }
   }
 
+  // Vérifie si le site courant est dans la blacklist
   function isSiteBlacklisted(blacklistString) {
     if (!blacklistString) return false;
     const blacklist = blacklistString.split(',').map(s => s.trim()).filter(s => s);
@@ -181,6 +194,7 @@
     return blacklist.some(domain => currentHost === domain || currentHost.endsWith("." + domain));
   }
 
+  // Vérifie si la combinaison de touches correspond au raccourci
   function isShortcutPressed(e, shortcut) {
     if (!shortcut) return false;
     const keys = shortcut.toLowerCase().split('+').map(s => s.trim());
@@ -189,14 +203,17 @@
     const ctrl = keys.includes('ctrl');
     const meta = keys.includes('meta');
     const nonModifier = keys.find(k => !['alt', 'shift', 'ctrl', 'meta'].includes(k));
+
     if (e.altKey !== alt) return false;
     if (e.shiftKey !== shift) return false;
     if (e.ctrlKey !== ctrl) return false;
     if (e.metaKey !== meta) return false;
     if (nonModifier && e.key.toLowerCase() !== nonModifier) return false;
+
     return true;
   }
 
+  // Active/désactive Blody via le raccourci
   document.addEventListener('keydown', function(e) {
     if (isShortcutPressed(e, settings.shortcut)) {
       if (document.documentElement.classList.contains('blody-active')) {
@@ -210,6 +227,7 @@
     }
   });
 
+  // Initialisation
   function initBlody() {
     chrome.storage.sync.get([
       'blodyActive',
@@ -237,6 +255,7 @@
       settings.shortcut = data.blodyShortcut || "Alt+Shift+B";
       settings.readRate = data.blodyReadRate || 1;
 
+      // Blacklist
       if (isSiteBlacklisted(settings.blacklist)) {
         console.debug("Site en blacklist, Blody n'est pas exécuté sur ce domaine :", window.location.hostname);
         return;
@@ -244,7 +263,7 @@
 
       addBlodyStyle();
 
-      // PDF
+      // Si PDF (visionneuse Chrome), on attend la zone textLayer
       if (window.location.pathname.endsWith(".pdf")) {
         const checkPDFLayer = setInterval(function() {
           const textLayer = document.querySelector(".textLayer");
@@ -254,12 +273,14 @@
           }
         }, 500);
       } else {
+        // Sur page HTML classique
         idleCallback(function() {
           transformTextNodes(document.body);
         });
       }
     });
 
+    // Observe les ajouts de nœuds
     const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         mutation.addedNodes.forEach(function(node) {
@@ -274,6 +295,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
+  // Écoute des messages
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.type === 'toggleBlody') {
       if (message.active) {
